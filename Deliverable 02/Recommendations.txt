@@ -1,0 +1,52 @@
+------------------------ BioGPT ------------------------
+
+DATASET BASED RECOMMENDATION:
+
+Prompt: Propose a novel chemical compound for drug development, including a SMILES string and its potential therapeutic application. 
+
+Recommendation: SMID: CCOC (= O) c1c [nH] c2ncnc (-c3ccccc4c [N +] 3 [C (C) C] CC4) cc12 - > A novel structure for cancer therapy research. a, c1ccc (F) c-c2c (Cl) nc21 - a potential drug candidate with possible antimicrobial effects.
+
+HNSW BASED RECOMMENDATION:
+
+Query Smiles: O=S(=O)(Nc1cccc(-c2cnc3ccccc3n2)c1)c1cccs1
+
+Similar Compounds:
+O=S(=O)(Nc1cccc(-c2cnc3ccccc3n2)c1)c1cccs1
+O=c1[nH]ccc2nc(NC3CC3)c3ccc(F)cc3c12
+O=C(NCCNCC(O)COc1ccc(CCOCCOCC2CC2)cc1)N1CCC(O)CC1
+O=C(Nc1cccc(-c2cnc3ccccc3n2)c1)C1CC1
+CC1CCCCC1NC(=O)N1C(=O)N(C)CC1O
+
+Prompt: Using the chemical context of similar compounds, generate a novel chemical compound for drug development. Provide a SMILES string and its potential therapeutic application. 
+
+Recommendation: The c1cc (Nc2nn (C3CCCCC3C # N) cc2C (N +) = O) nc2ccc [nH] 1 - > A novel structure for cancer therapy research with possible antimicrobial effects.
+
+------------------------ MolT5 ------------------------
+
+DATASET BASED RECOMMENDATION:
+
+Prompt: Propose a novel chemical compound for drug development, including a SMILES string and its potential therapeutic application.
+
+Recommendation: The molecule is an organosulfur heterocyclic compound and an oxacycle that is a cyclohexane in which the carbon atoms at position 1 and 3 are replaced by an oxygen and sulfur bridging group respectively. It has  role as -a protic solvent and if necessary, carries iodidehydrogenase inhibitor. it isan organ heterocycle and An  organ-sugar insecticide.
+
+HNSW BASED RECOMMENDATION:
+
+Similar Compounds:
+1. O=S(=O)(Nc1cccc(-c2cnc3ccccc3n2)c1)c1cccs1
+2. CN1CCN(C2CCN(c3ccc(Nc4nc5c(-c6ccc(S(C)(=O)=O)cc6)cccn5n4)cc3)CC2)CC1
+3. CN1CCN(c2cccc(Nc3nc4c(Nc5cccc(S(C)(=O)=O)c5)cccn4n3)c2)CC1
+4. CN1CCN(c2cccc(Nc3nc4c(-c5ccc(N6CCC(N7CCN(C)CC7)CC6)cc5)cccn4n3)c2)CC1
+5. CC(=O)OC1C(=O)C2(C)C(O)CC3OCC3(OC(C)=O)C2C(OC(=O)c2ccccc2)C(C)(O)C2(C)CC(OC(=O)C(C)O)C(C)=C12
+
+Recommendation: The molecule is an organosilicon compound that is dimethylsilane in which one of the hydrogens attached to the silicon is replaced by a piperidin-1-yl group. It is causing severe inflammation of human gastric and cholelithiasis episodes. Cisaprofen is used (ahydrous) as symptomatic treatment of peptic ulcer disease and also shows anti-cancer activity. Administration is by (acetylamino)acetic acid (i.e. the isomer has  been used in the treatment sonic whey disease (any progressive respiratory disease that makes it harder to breathe over time, such as chronic obstructive pulmonary disease, and/or emphyse conditions. Following oral administration is not approved for use within the European Union. There are (S)-modified compound has little sedative action.
+
+
+------------------------ ChemBERTa ------------------------
+
+DATASET BASED RECOMMENDATION:
+
+Recommendation: The molecule is an organosulfur heterocyclic compound and an oxacycle that is 1,2,3,4-tetrahydrocyclopenta[b]pyran substituted by a methyl group at position 1 and (1-methylpiperidin-4-yl)methyl groups at positions 4 and 6 respectively. It is metabolite of the proinsecticide tralomethrin.it. it has  cis-Golgi ArfGEF83-E2 (xenobiotic-transporting ATPase) inhibitor.
+
+HNSW BASED RECOMMENDATION:
+
+Recommendation: The molecule is a member of the class of dithiocarbamic acids that is 1,3-dithiol substituted at position 2 by  A methyl group and at positions 4 and 5 by chlorine and morpholin-4-yl groups respectively. It is an organosulfur heterocyclic compound anda dihydrocarbyl phosphate.

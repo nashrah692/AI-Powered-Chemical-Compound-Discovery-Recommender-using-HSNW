@@ -1,0 +1,147 @@
+Algorithm: RAG-based Chemical Compound Recommendation System
+
+Input: Dataset with SMILES, Morgan fingerprints, properties (pIC50, logP), GNN embeddings; Query SMILES string
+Output: List of similar compounds and novel compound recommendations for BioGPT, MolT5, T5-small
+
+1. Preprocessing
+   - Load SMILES dataset from "/kaggle/input/smiles/SMILES_Big_Data_Set.csv"
+   - Standardize SMILES strings using RDKit
+   - Generate 2048-bit Morgan fingerprints
+   - Compute properties (pIC50, logP, num_atoms)
+   - Generate 256-dimensional GNN embeddings using GIN layers
+   - Save preprocessed dataset with SMILES, fingerprints, properties, embeddings
+
+2. Load preprocessed dataset with SMILES, Morgan fingerprints, properties, and GNN embeddings
+3. Parse Morgan fingerprints from string to array
+4. Load pre-trained HNSW index with parameters (M=32, efConstruction=200, efSearch=100)
+5. Define GIN model for fingerprint embedding
+6. Load GIN model weights
+7. Initialize CompoundRecommender with HNSW index, dataset, and GIN model
+
+Procedure TuneOnDataset(model_name, epochs, batch_size, grad_accum_steps)
+8. Load LLM model and tokenizer with given model_name (BioGPT, MolT5, T5-small)
+9. If model or tokenizer not loaded then
+10.    Return error message
+11. End if
+12. Generate prompts for 100 random SMILES with templates (e.g., "This compound may exhibit anti-inflammatory properties")
+13. Set model to training mode
+14. Initialize Adam optimizer (learning_rate=1e-5)
+15. Enable mixed precision training with GradScaler
+16. Prepare dataset and loader for tokenized prompts (max_length=128)
+17. For each epoch from 1 to epochs do
+18.    Initialize total_loss and step
+19.    Clear gradients
+20.    For each batch in loader do
+21.        Move batch to device (cuda)
+22.        Compute loss with gradient accumulation
+23.        If loss is not NaN then
+24.            Backpropagate loss
+25.            Clip gradients (max_norm=1.0)
+26.            Increment step
+27.            If step mod grad_accum_steps equals 0 then
+28.                Update weights
+29.                Clear gradients
+30.            End if
+31.            Add loss to total_loss
+32.        End if
+33.    End for
+34.    If step mod grad_accum_steps not zero then
+35.        Update weights
+36.        Clear gradients
+37.    End if
+38.    Print epoch and average loss
+39. End for
+40. Save fine-tuned model
+41. Clear model and free memory
+42. Print tuning completion
+End procedure
+
+Procedure TuneWithHNSW(model_name, epochs, batch_size, grad_accum_steps)
+43. Load LLM model and tokenizer with given model_name (BioGPT, MolT5, T5-small)
+44. If model or tokenizer not loaded then
+45.    Return error message
+46. End if
+47. Generate pairs of similar compounds using HNSW index (top-5 similar SMILES per query)
+48. Generate comparison prompts for pairs (e.g., "This compound, similar to [SMILES], has antimicrobial potential")
+49. Set model to training mode
+50. Initialize Adam optimizer (learning_rate=1e-5)
+51. Enable mixed precision training with GradScaler
+52. Prepare dataset and loader for tokenized prompts (max_length=128)
+53. For each epoch from 1 to epochs do
+54.    Initialize total_loss and step
+55.    Clear gradients
+56.    For each batch in loader do
+57.        Move batch to device (cuda)
+58.        Compute loss with gradient accumulation
+59.        If loss is not NaN then
+60.            Backpropagate loss
+61.            Clip gradients (max_norm=1.0)
+62.            Increment step
+63.            If step mod grad_accum_steps equals 0 then
+64.                Update weights
+65.                Clear gradients
+66.            End if
+67.            Add loss to total_loss
+68.        End if
+69.    End for
+70.    If step mod grad_accum_steps not zero then
+71.        Update weights
+72.        Clear gradients
+73.    End if
+74.    Print epoch and average loss
+75. End for
+76. Save fine-tuned model
+77. Clear model and free memory
+78. Print tuning completion
+End procedure
+
+Function FPToEmbedding(fingerprint)
+79. Prepare fingerprint as graph data for GIN model
+80. Set GIN model to evaluation mode
+81. Generate 256-dimensional embedding using GIN model
+82. Return embedding
+End function
+
+Function Recommend(query_smiles, model_name, top_k)
+83. Convert query SMILES to molecule using RDKit
+84. If molecule is None then
+85.    Return error message
+86. End if
+87. Generate 2048-bit Morgan fingerprint for query SMILES
+88. Convert fingerprint to 256-dimensional embedding using FPToEmbedding
+89. Normalize embedding for cosine similarity
+90. Search HNSW index for top_k similar compounds
+91. Get SMILES and properties (logP, pIC50) of similar compounds
+92. Compute Tanimoto similarities for similar compounds
+93. Load LLM model and tokenizer with given model_name (BioGPT, MolT5, T5-small)
+94. If model or tokenizer not loaded then
+95.    Return error message
+96. End if
+97. Prepare context with top_k similar compounds (e.g., "Compound: [SMILES]...")
+98. Construct prompt with system instruction: "Generate novel SMILES with application: SMILES: Application: "
+99. If model_name == "BioGPT" then
+100.    Set generation_params = {max_new_tokens=200, temperature=0.3, top_p=0.9, top_k=50}
+101. Else
+102.    Set generation_params = {max_new_tokens=200, temperature=0.5, top_p=0.9, top_k=40}
+103. End if
+104. Generate recommendation using LLM with prompt and generation_params
+105. Extract SMILES and application from output using regex
+106. If extraction fails or SMILES invalid (RDKit) or not novel (check against context and dataset) then
+107.    Return "Invalid or non-novel SMILES"
+108. End if
+109. Clear model and free memory
+110. Return similar compounds (SMILES, logP, pIC50, Tanimoto) and recommendation (SMILES, application)
+End function
+
+111. Initialize CompoundRecommender
+112. Set query SMILES
+113. For each model_name in {BioGPT, MolT5, T5-small} do
+114.    Call TuneOnDataset(model_name, epochs=2, batch_size=1, grad_accum_steps=4)
+115.    Call Recommend(query_smiles, model_name, top_k=5)
+116.    Save dataset-tuned recommendation to recommendations.txt
+117.    Call TuneWithHNSW(model_name, epochs=1, batch_size=1, grad_accum_steps=4)
+118.    Call Recommend(query_smiles, model_name, top_k=5)
+119.    Save HNSW-tuned recommendation to recommendations.txt
+120. End for
+121. Generate final recommendation by selecting best output (highest Tanimoto similarity or logP) from BioGPT or MolT5
+122. Save final recommendation to recommendations.txt
